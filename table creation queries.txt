@@ -1,0 +1,59 @@
+CREATE TABLE Users (
+    user_id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(255) UNIQUE NOT NULL,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    full_name VARCHAR(255),
+    balance INT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Create the Items table
+CREATE TABLE Items (
+    item_id INT AUTO_INCREMENT PRIMARY KEY,
+    seller_id INT NOT NULL,
+    item_name VARCHAR(255) NOT NULL,
+    description TEXT,
+    starting_price DECIMAL(10, 2) NOT NULL,
+    start_time TIMESTAMP NOT NULL,
+    end_time TIMESTAMP NOT NULL,
+    status ENUM('active', 'closed', 'cancelled') NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (seller_id) REFERENCES Users(user_id)
+);
+
+-- Create the Bids table
+CREATE TABLE Bids (
+    bid_id INT AUTO_INCREMENT PRIMARY KEY,
+    bidder_id INT NOT NULL,
+    item_id INT NOT NULL,
+    amount DECIMAL(10, 2) NOT NULL,
+    bid_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (bidder_id) REFERENCES Users(user_id),
+    FOREIGN KEY (item_id) REFERENCES Items(item_id),
+    CHECK (amount > 0),
+    CHECK (bid_time BETWEEN start_time AND end_time)
+);
+
+-- Create the Categories table
+CREATE TABLE Categories (
+    category_id INT AUTO_INCREMENT PRIMARY KEY,
+    category_name VARCHAR(255) NOT NULL
+);
+
+-- Create the Watchlist table
+CREATE TABLE Watchlist (
+    watchlist_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    item_id INT NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES Users(user_id),
+    FOREIGN KEY (item_id) REFERENCES Items(item_id)
+);
+CREATE TABLE Sellers (
+    seller_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL UNIQUE,
+    seller_name VARCHAR(255) NOT NULL,
+    contact_email VARCHAR(255),
+    contact_phone VARCHAR(20),
+    FOREIGN KEY (user_id) REFERENCES Users(user_id)
+);
